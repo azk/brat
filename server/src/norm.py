@@ -7,7 +7,7 @@ Normalization support.
 '''
 
 import normdb
-import simstringdb
+# import simstringdb
 import sdistance
 from datetime import datetime
 from message import Messager
@@ -261,7 +261,7 @@ _norm_score.__cache = {}
 def _norm_search_name_attr(database, name, attr,
                            matched, score_by_id, score_by_str,
                            best_score=0, exactmatch=False,
-                           threshold=simstringdb.DEFAULT_THRESHOLD):
+                           threshold=0.7):
     # helper for norm_search, searches for matches where given name
     # appears either in full or as an approximate substring of a full
     # name (if exactmatch is False) in given DB. If attr is not None,
@@ -278,24 +278,24 @@ def _norm_search_name_attr(database, name, attr,
     if attr is not None:
         utfattr = attr.encode('UTF-8')
         normattr = string_norm_form(utfattr)
-        if not simstringdb.ssdb_supstring_exists(normattr, database, 1.0):
+        # if not simstringdb.ssdb_supstring_exists(normattr, database, 1.0):
             # debugging
             #Messager.info('Early norm search fail on "%s"' % attr)
-            return best_score
+        return best_score
 
-    if exactmatch:
+    # if exactmatch:
         # only candidate string is given name
-        strs = [name]
-        ss_norm_score = { string_norm_form(name): 1.0 }
-    else:
+    strs = [name]
+    ss_norm_score = { string_norm_form(name): 1.0 }
+    # else:
         # expand to substrings using simstring
         # simstring requires UTF-8
-        utfname = name.encode('UTF-8')
-        normname = string_norm_form(utfname)
-        str_scores = simstringdb.ssdb_supstring_lookup(normname, database,
-                                                       threshold, True)
-        strs = [s[0] for s in str_scores]
-        ss_norm_score = dict(str_scores)
+        # utfname = name.encode('UTF-8')
+        # normname = string_norm_form(utfname)
+        # str_scores = simstringdb.ssdb_supstring_lookup(normname, database,
+        # threshold, True)
+        # strs = [s[0] for s in str_scores]
+        # ss_norm_score = dict(str_scores)
 
         # TODO: recreate this older filter; watch out for which name to use!
 #         # filter to strings not already considered
@@ -427,7 +427,7 @@ def _norm_search_impl(database, name, collection=None, exactmatch=False):
 def norm_search(database, name, collection=None, exactmatch=False):
     try:
         return _norm_search_impl(database, name, collection, exactmatch)
-    except simstringdb.ssdbNotFoundError, e:
+    except Exception, e:
         Messager.warning(str(e))
         return { 
             'database' : database,

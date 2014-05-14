@@ -42,7 +42,7 @@ from os.path import dirname, basename, splitext, join
 import sqlite3 as sqlite
 
 try:
-    import simstring
+    import codecs
 except ImportError:
     errorstr = """
     Error: failed to import the simstring library.
@@ -358,12 +358,15 @@ def main(argv):
             print >> sys.stderr, "Creating simstring DB ...",
         
         try:
-            ssdb = simstring.writer(ssdbfn)
+            ssdb = codecs.open(ssdbfn,'w','utf-8')
             for row in cursor.execute(SELECT_SIMSTRING_STRINGS_COMMAND):
                 # encode as UTF-8 for simstring
-                s = row[0].encode('utf-8')
-                ssdb.insert(s)
-                simstring_count += 1
+                try:
+                    s = row[0].encode('utf-8','ignore')
+                    ssdb.write(s + u"\n")
+                    simstring_count += 1
+                except:
+                    pass
             ssdb.close()
         except:
             print >> sys.stderr, "Error building simstring DB"

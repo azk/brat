@@ -47,7 +47,7 @@ import sdistance
 import search
 import server
 import session
-import simstringdb
+# import simstringdb
 import sosmessage
 import ssplit
 import sspostproc
